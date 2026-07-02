@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
-import { gateway } from '../lib/braintree';
+import { getGateway } from '../lib/braintree';
 import { decryptQrSecret } from '../lib/wallet';
 import { signQrToken } from '../lib/jwt';
 import { mintTicketForOrder } from '../services/mintService';
@@ -141,7 +141,7 @@ router.post('/purchase', requireAuth, async (req: Request, res: Response) => {
   });
 
   // Charge via Braintree
-  const result = await gateway.transaction.sale({
+  const result = await getGateway().transaction.sale({
     amount: amountUSD,
     paymentMethodNonce: body.paymentNonce,
     options: { submitForSettlement: true },

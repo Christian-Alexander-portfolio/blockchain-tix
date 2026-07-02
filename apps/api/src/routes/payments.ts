@@ -2,13 +2,13 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
-import { gateway } from '../lib/braintree';
+import { getGateway } from '../lib/braintree';
 
 const router = Router();
 
 // GET /api/payments/braintree-token
 router.get('/braintree-token', requireAuth, async (req: Request, res: Response) => {
-  const result = await gateway.clientToken.generate({});
+  const result = await getGateway().clientToken.generate({});
   res.json({ clientToken: result.clientToken });
 });
 

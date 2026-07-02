@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ethers } from 'ethers';
 import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
-import { gateway } from '../lib/braintree';
+import { getGateway } from '../lib/braintree';
 import { executeResaleSale } from '../services/mintService';
 
 const router = Router();
@@ -99,7 +99,7 @@ router.post('/:id/buy', requireAuth, async (req: Request, res: Response) => {
   });
 
   // Charge buyer
-  const result = await gateway.transaction.sale({
+  const result = await getGateway().transaction.sale({
     amount: amountUSD,
     paymentMethodNonce: body.paymentNonce,
     options: { submitForSettlement: true },

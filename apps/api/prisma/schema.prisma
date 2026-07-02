@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  ORGANIZER
+  SCANNER
+  ADMIN
+}
+
+enum OrganizerStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+}
+
+enum TicketStatus {
+  OWNED
+  LISTED
+  SCANNED
+  VOID
+  TRANSFERRED
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  BRAINTREE_CARD
+  BRAINTREE_APPLE_PAY
+  BRAINTREE_GOOGLE_PAY
+  USDC_POLYGON
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String
+  role          UserRole  @default(USER)
+  googleId      String?   @unique
+  appleId       String?   @unique
+  avatarUrl     String?
+  emailVerified Boolean   @default(false)
+
+  refreshTokens RefreshToken[]
+  wallet        Wallet?
+  organizer     Organizer?
+  orders        Order[]
+  tickets       Ticket[]
+  listings      Listing[]     @relation("SellerListings")
+  scanLogs      ScanLog[]     @relation("ScannerLogs")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Wallet {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address      String   @unique
+  encryptedKey String
+  keyIv        String
+  keyAuthTag   String
+  createdAt    DateTime @default(now())
+}
+
+model Organizer {
+  id          String          @id @default(cuid())
+  userId      String          @unique
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgName     String
+  description String?
+  logoUrl     String?
+  websiteUrl  String?
+  status      OrganizerStatus @default(PENDING)
+  events      Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id              String   @id @default(cuid())
+  organizerId     String
+  organizer       Organizer @relation(fields: [organizerId], references: [id])
+  title           String
+  slug            String   @unique
+  description     String
+  venue           String
+  address         String
+  city            String
+  country         String
+  startsAt        DateTime
+  endsAt          DateTime
+  imageUrl        String?
+  isPublished     Boolean  @default(false)
+  isCancelled     Boolean  @default(false)
+  blockchainEventId BigInt?
+
+  tiers   TicketTier[]
+  tickets Ticket[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizerId])
+  @@index([startsAt])
+  @@index([isPublished, isCancelled])
+}
+
+model TicketTier {
+  id               String    @id @default(cuid())
+  eventId          String
+  event            Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  faceValueCents   Int
+  totalSupply      Int
+  remainingSupply  Int
+  salesStartAt     DateTime?
+  salesEndAt       DateTime?
+  blockchainTierId BigInt?
+
+  tickets Ticket[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  tokenId      String       @unique
+  ownerId      String
+  owner        User         @relation(fields: [ownerId], references: [id])
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id])
+  tierId       String
+  tier         TicketTier   @relation(fields: [tierId], references: [id])
+  status       TicketStatus @default(OWNED)
+  qrSecret     String
+  qrSecretIv   String
+  qrSecretTag  String
+  mintTxHash   String?
+  usedAt       DateTime?
+
+  orders   Order[]
+  listing  Listing?
+  scanLogs ScanLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([eventId])
+  @@index([status])
+}
+
+model Listing {
+  id               String        @id @default(cuid())
+  ticketId         String        @unique
+  ticket           Ticket        @relation(fields: [ticketId], references: [id])
+  sellerId         String
+  seller           User          @relation("SellerListings", fields: [sellerId], references: [id])
+  askPriceCents    Int
+  status           ListingStatus @default(ACTIVE)
+  onChainListingId BigInt?
+  listTxHash       String?
+  soldTxHash       String?
+
+  order Order?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  buyerId          String
+  buyer            User          @relation(fields: [buyerId], references: [id])
+  ticketId         String
+  ticket           Ticket        @relation(fields: [ticketId], references: [id])
+  listingId        String?       @unique
+  listing          Listing?      @relation(fields: [listingId], references: [id])
+  amountCents      Int
+  paymentMethod    PaymentMethod
+  status           OrderStatus   @default(PENDING)
+  braintreeTransId String?
+  usdcTxHash       String?
+  platformFeeCents Int           @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buyerId])
+  @@index([status])
+}
+
+model UsdcPaymentSession {
+  id           String   @id @default(cuid())
+  toAddress    String
+  expectedUsdc String
+  amountCents  Int
+  tierId       String?
+  listingId    String?
+  userId       String
+  fulfilled    Boolean  @default(false)
+  txHash       String?
+  expiresAt    DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([fulfilled])
+}
+
+model PlatformSettings {
+  id                 String  @id @default("singleton")
+  resaleMarkupMaxBps Int     @default(1500)
+  platformFeeBps     Int     @default(250)
+  maintenanceMode    Boolean @default(false)
+
+  updatedAt DateTime @updatedAt
+}
+
+model ScanLog {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+  scannerId  String?
+  scanner    User?    @relation("ScannerLogs", fields: [scannerId], references: [id])
+  eventId    String
+  success    Boolean
+  failReason String?
+  ipAddress  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@index([eventId])
+}

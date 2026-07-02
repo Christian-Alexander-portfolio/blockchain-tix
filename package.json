@@ -1,0 +1,20 @@
+{
+  "name": "blockchain-tickets",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "contracts:compile": "turbo run compile --filter=@blockchain-tickets/contracts",
+    "contracts:test": "turbo run test --filter=@blockchain-tickets/contracts",
+    "contracts:deploy:testnet": "turbo run deploy:testnet --filter=@blockchain-tickets/contracts"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0",
+    "prettier": "^3.2.0"
+  },
+  "packageManager": "pnpm@11.9.0"
+}

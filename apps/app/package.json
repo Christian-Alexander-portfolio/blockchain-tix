@@ -1,0 +1,46 @@
+{
+  "name": "@blockchain-tickets/app",
+  "version": "0.0.1",
+  "main": "expo-router/entry",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "build:preview": "eas build --profile preview",
+    "build:production": "eas build --profile production",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@blockchain-tickets/shared": "workspace:*",
+    "@expo/vector-icons": "^14.0.0",
+    "@tanstack/react-query": "^5.50.0",
+    "expo": "~53.0.0",
+    "expo-apple-authentication": "~7.2.0",
+    "expo-camera": "~16.0.0",
+    "expo-image-picker": "~16.0.0",
+    "expo-linear-gradient": "~14.0.0",
+    "expo-router": "~4.0.0",
+    "expo-secure-store": "~14.0.0",
+    "expo-status-bar": "~2.2.0",
+    "nativewind": "^4.0.1",
+    "react": "18.3.1",
+    "react-hook-form": "^7.52.0",
+    "react-native": "0.76.9",
+    "react-native-gesture-handler": "~2.20.0",
+    "react-native-qrcode-svg": "^6.3.0",
+    "react-native-reanimated": "~3.16.0",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-svg": "15.8.0",
+    "react-native-web": "^0.20.0",
+    "react-native-webview": "13.12.5",
+    "zod": "^3.23.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "~18.3.0",
+    "tailwindcss": "3.4.3",
+    "typescript": "~5.7.0"
+  }
+}

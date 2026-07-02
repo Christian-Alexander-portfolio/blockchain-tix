@@ -23,9 +23,9 @@ export const config = {
   qrMasterKey: required('QR_MASTER_KEY'),
 
   polygonRpcUrl: optional('POLYGON_RPC_URL', 'https://rpc-amoy.polygon.technology'),
-  deployerPrivateKey: required('DEPLOYER_PRIVATE_KEY'),
-  nftContractAddress: required('NFT_CONTRACT_ADDRESS'),
-  marketplaceContractAddress: required('MARKETPLACE_CONTRACT_ADDRESS'),
+  deployerPrivateKey: optional('DEPLOYER_PRIVATE_KEY', ''),
+  nftContractAddress: optional('NFT_CONTRACT_ADDRESS', ''),
+  marketplaceContractAddress: optional('MARKETPLACE_CONTRACT_ADDRESS', ''),
   usdcContractAddress: optional(
     'USDC_CONTRACT_ADDRESS',
     '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
@@ -33,20 +33,20 @@ export const config = {
 
   braintree: {
     environment: optional('BRAINTREE_ENV', 'sandbox'),
-    merchantId: required('BRAINTREE_MERCHANT_ID'),
-    publicKey: required('BRAINTREE_PUBLIC_KEY'),
-    privateKey: required('BRAINTREE_PRIVATE_KEY'),
+    merchantId: optional('BRAINTREE_MERCHANT_ID', ''),
+    publicKey: optional('BRAINTREE_PUBLIC_KEY', ''),
+    privateKey: optional('BRAINTREE_PRIVATE_KEY', ''),
   },
 
-  resendApiKey: required('RESEND_API_KEY'),
+  resendApiKey: optional('RESEND_API_KEY', ''),
   fromEmail: optional('FROM_EMAIL', 'tickets@blockchaintickets.app'),
 
   r2: {
-    accountId: required('R2_ACCOUNT_ID'),
-    accessKeyId: required('R2_ACCESS_KEY_ID'),
-    secretAccessKey: required('R2_SECRET_ACCESS_KEY'),
-    bucketName: required('R2_BUCKET_NAME'),
-    publicUrl: required('R2_PUBLIC_URL'),
+    accountId: optional('R2_ACCOUNT_ID', ''),
+    accessKeyId: optional('R2_ACCESS_KEY_ID', ''),
+    secretAccessKey: optional('R2_SECRET_ACCESS_KEY', ''),
+    bucketName: optional('R2_BUCKET_NAME', 'blockchain-tickets'),
+    publicUrl: optional('R2_PUBLIC_URL', ''),
   },
 
   google: {

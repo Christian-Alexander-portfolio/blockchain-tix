@@ -89,7 +89,7 @@ router.get('/events/:id/sales', requireAuth, async (req: Request, res: Response)
     scanned: tier.tickets.filter((t: { status: string }) => t.status === 'SCANNED').length,
   }));
 
-  const totalRevenue = salesData.reduce((sum: number, t) => sum + t.revenueCents, 0);
+  const totalRevenue = salesData.reduce((sum: number, t: { revenueCents: number }) => sum + t.revenueCents, 0);
   res.json({ event: { id: event.id, title: event.title }, tiers: salesData, totalRevenueCents: totalRevenue });
 });
 

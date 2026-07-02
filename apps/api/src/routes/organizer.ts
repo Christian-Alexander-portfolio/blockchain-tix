@@ -78,7 +78,7 @@ router.get('/events/:id/sales', requireAuth, async (req: Request, res: Response)
     return;
   }
 
-  const salesData = event.tiers.map((tier) => ({
+  const salesData = event.tiers.map((tier: typeof event.tiers[number]) => ({
     tierId: tier.id,
     tierName: tier.name,
     totalSupply: tier.totalSupply,
@@ -86,10 +86,10 @@ router.get('/events/:id/sales', requireAuth, async (req: Request, res: Response)
     remaining: tier.remainingSupply,
     faceValueCents: tier.faceValueCents,
     revenueCents: (tier.totalSupply - tier.remainingSupply) * tier.faceValueCents,
-    scanned: tier.tickets.filter((t) => t.status === 'SCANNED').length,
+    scanned: tier.tickets.filter((t: { status: string }) => t.status === 'SCANNED').length,
   }));
 
-  const totalRevenue = salesData.reduce((sum, t) => sum + t.revenueCents, 0);
+  const totalRevenue = salesData.reduce((sum: number, t) => sum + t.revenueCents, 0);
   res.json({ event: { id: event.id, title: event.title }, tiers: salesData, totalRevenueCents: totalRevenue });
 });
 

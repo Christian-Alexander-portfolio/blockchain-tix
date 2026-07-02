@@ -130,8 +130,8 @@ router.get('/analytics', async (req: Request, res: Response) => {
     }),
   ]);
 
-  const totalRevenueCents = completedOrders.reduce((sum, o) => sum + o.amountCents, 0);
-  const platformRevenueCents = completedOrders.reduce((sum, o) => sum + o.platformFeeCents, 0);
+  const totalRevenueCents = completedOrders.reduce((sum: number, o) => sum + o.amountCents, 0);
+  const platformRevenueCents = completedOrders.reduce((sum: number, o) => sum + o.platformFeeCents, 0);
 
   res.json({
     totalUsers,
